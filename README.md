@@ -57,3 +57,6 @@ Fill in the form and click "Add".
 
 Check the Server Terminal. You will see the "Mock Email Invite Link".
 Screenshots
+\screenshots\image_2.png
+\screenshots\image.png
+\screenshots\imagg_1.png
