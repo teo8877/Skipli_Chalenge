@@ -21,7 +21,7 @@ io.on("connection", (socket) => {
 
   // Nghe sự kiện: Client gửi tin nhắn lên
   socket.on("send_message", (data) => {
-    console.log("📩 Nhận tin nhắn:", data);
+    console.log("Nhận tin nhắn:", data);
     // Gửi tin nhắn này lại cho TẤT CẢ mọi người (Broadcast)
     io.emit("receive_message", data);
   });
@@ -73,7 +73,7 @@ app.post('/send-otp', async (req, res) => {
 
     // MOCK: Thay vì gửi SMS, ta in ra console của Server
     console.log("------------------------------------------------");
-    console.log(`⚠️  MÃ OTP CHO ${phoneNumber} LÀ: ${otpCode}`);
+    console.log(` MÃ OTP CHO ${phoneNumber} LÀ: ${otpCode}`);
     console.log("------------------------------------------------");
 
     res.send({ success: true, message: "Đã gửi mã OTP (Check console server)" });
@@ -136,8 +136,8 @@ app.post('/create-employee', async (req, res) => {
 
     // MOCK EMAIL: Thay vì gửi email thật, in ra console
     console.log("------------------------------------------------");
-    console.log(`📧 GỬI EMAIL MỜI CHO: ${email}`);
-    console.log(`🔗 LINK SETUP ACCOUNT: http://localhost:5173/setup/${docRef.id}`);
+    console.log(`GỬI EMAIL MỜI CHO: ${email}`);
+    console.log(`LINK SETUP ACCOUNT: http://localhost:5173/setup/${docRef.id}`);
     console.log("------------------------------------------------");
 
     res.send({ success: true, id: docRef.id, message: "Đã thêm NV & Gửi mail!" });

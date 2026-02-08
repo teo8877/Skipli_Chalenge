@@ -1,3 +1,4 @@
+import './App.css'
 import { useState ,useEffect} from 'react'
 import axios from 'axios'
 import io from 'socket.io-client';
@@ -97,13 +98,14 @@ const sendMessage = async () => {
   }
 };
   return (
-    <div style={{ padding: '50px', fontFamily: 'Arial' }}>
-      <h1>Skipli Challenge - Day 2: Auth</h1>
-      
+     
+    <div  className="container" style={{ padding: '50px', fontFamily: 'Arial' }}>
+      <h1>Skipli Challenge</h1>
+  
       {/* Màn hình 1: Nhập SĐT */}
       {step === 1 && (
         <div>
-          <h3>Bước 1: Nhập Số Điện Thoại</h3>
+          <h3>Nhập Số Điện Thoại</h3>
           <input 
             type="text" 
             placeholder="Số điện thoại (VD: 0987654321)" 
@@ -118,7 +120,7 @@ const sendMessage = async () => {
       {/* Màn hình 2: Nhập OTP */}
       {step === 2 && (
         <div>
-          <h3>Bước 2: Nhập mã OTP</h3>
+          <h3>Nhập mã OTP</h3>
           <p>Đã gửi mã đến: <strong>{phoneNumber}</strong></p>
           <p><em>(Hãy nhìn vào Terminal đang chạy Server để lấy mã)</em></p>
           <input 
@@ -136,7 +138,7 @@ const sendMessage = async () => {
       {step === 3 && (
   <div>
     <h2>Dashboard Quản Lý (Owner: {phoneNumber})</h2>
-    <button onClick={fetchEmployees}>🔄 Tải danh sách NV</button>
+    <button onClick={fetchEmployees}> Tải danh sách NV</button>
 
     {/* Form thêm NV */}
     <div style={{ border: '1px solid #ccc', padding: '15px', marginTop: '20px' }}>
@@ -188,7 +190,7 @@ const sendMessage = async () => {
     </table>
     {/* --- KHUNG CHAT REALTIME --- */}
 <div style={{ marginTop: 50, border: '2px solid #007bff', padding: 20, maxWidth: 400 }}>
-  <h3>💬 Chat Nội Bộ</h3>
+  <h3>Chat Nội Bộ</h3>
 
   {/* Khung hiển thị tin nhắn */}
   <div style={{ height: 200, overflowY: 'scroll', border: '1px solid #ccc', marginBottom: 10, padding: 10 }}>
@@ -220,10 +222,12 @@ const sendMessage = async () => {
       onKeyPress={(event) => { event.key === "Enter" && sendMessage(); }}
       style={{ flex: 1, padding: 10 }}
     />
-    <button onClick={sendMessage} style={{ padding: 10, background: '#007bff', color: 'white' }}>Gửi 🚀</button>
+    <button onClick={sendMessage} style={{ padding: 10, background: '#007bff', color: 'white' }}>Gửi</button>
   </div>
+  
 </div>
   </div>
+ 
 )}
 
       {/* Thông báo lỗi/thành công */}
