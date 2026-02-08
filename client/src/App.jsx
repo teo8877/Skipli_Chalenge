@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState ,useEffect} from 'react'
 import axios from 'axios'
-
+import io from 'socket.io-client';
+const socket = io.connect("http://localhost:5000");// Kết nối tới Server tranh kết nối nnhiều lần
 function App() {
   // Các biến để lưu trạng thái
   const [step, setStep] = useState(1); // 1: Nhập SĐT, 2: Nhập OTP, 3: Đã Login
@@ -9,7 +10,9 @@ function App() {
   const [message, setMessage] = useState('');
   const [employees, setEmployees] = useState([]); // Danh sách NV
   const [newEmp, setNewEmp] = useState({ name: '', email: '', department: '' }); // Form thêm NV
-
+// State cho Chat
+const [currentMessage, setCurrentMessage] = useState("");
+const [messageList, setMessageList] = useState([]);
   // Hàm gọi API gửi OTP
   const handleSendOtp = async () => {
     try {
@@ -64,6 +67,33 @@ const handleDelete = async (id) => {
     fetchEmployees(); // Tải lại danh sách
   } catch (error) {
     alert("Lỗi xóa NV");
+  }
+};
+
+// Lắng nghe tin nhắn từ Server gửi về
+useEffect(() => {
+  // Khi server phát sự kiện 'receive_message'
+  socket.on("receive_message", (data) => {
+    // Thêm tin nhắn mới vào danh sách
+    setMessageList((list) => [...list, data]);
+  });
+
+  // Cleanup khi thoát trang
+  return () => socket.off("receive_message");
+}, [socket]);
+
+// Hàm gửi tin nhắn
+const sendMessage = async () => {
+  if (currentMessage !== "") {
+    const messageData = {
+      author: phoneNumber, // Người gửi là số điện thoại đang login
+      message: currentMessage,
+      time: new Date().getHours() + ":" + new Date().getMinutes(),
+    };
+
+    // Gửi lên server
+    await socket.emit("send_message", messageData);
+    setCurrentMessage(""); // Xóa ô nhập
   }
 };
   return (
@@ -156,6 +186,43 @@ const handleDelete = async (id) => {
         ))}
       </tbody>
     </table>
+    {/* --- KHUNG CHAT REALTIME --- */}
+<div style={{ marginTop: 50, border: '2px solid #007bff', padding: 20, maxWidth: 400 }}>
+  <h3>💬 Chat Nội Bộ</h3>
+
+  {/* Khung hiển thị tin nhắn */}
+  <div style={{ height: 200, overflowY: 'scroll', border: '1px solid #ccc', marginBottom: 10, padding: 10 }}>
+    {messageList.map((msgContent, index) => (
+      <div key={index} style={{ textAlign: msgContent.author === phoneNumber ? 'right' : 'left' }}>
+        <div>
+          <strong>{msgContent.author}</strong> <small>({msgContent.time})</small>
+        </div>
+        <div style={{ 
+          background: msgContent.author === phoneNumber ? '#dcf8c6' : '#f1f0f0',
+          padding: '5px 10px', 
+          borderRadius: 10,
+          display: 'inline-block',
+          margin: '5px 0'
+        }}>
+          {msgContent.message}
+        </div>
+      </div>
+    ))}
+  </div>
+
+  {/* Ô nhập tin nhắn */}
+  <div style={{ display: 'flex' }}>
+    <input 
+      type="text" 
+      value={currentMessage} 
+      placeholder="Nhập tin nhắn..." 
+      onChange={(event) => { setCurrentMessage(event.target.value); }}
+      onKeyPress={(event) => { event.key === "Enter" && sendMessage(); }}
+      style={{ flex: 1, padding: 10 }}
+    />
+    <button onClick={sendMessage} style={{ padding: 10, background: '#007bff', color: 'white' }}>Gửi 🚀</button>
+  </div>
+</div>
   </div>
 )}
 

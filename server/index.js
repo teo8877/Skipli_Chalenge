@@ -1,11 +1,35 @@
 const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
-
+const http =require('http');//thư viện tạo server
+const {Server} = require('socket.io');//thư viện realtime
 // 1. Khởi tạo App
 const app = express();
 app.use(cors()); // Cho phép Frontend gọi
 app.use(express.json()); // Để đọc được dữ liệu JSON gửi lên
+// KHỞI TẠO SOCKET.IO  
+const server = http.createServer(app); // Bọc Express app vào HTTP Server
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173", // Cho phép Frontend gọi vào
+    methods: ["GET", "POST"]
+  }
+});
+//KHI CÓ AI ĐÓ KẾT NỐI VÀO SOCKET
+io.on("connection", (socket) => {
+  console.log(`⚡ User Connected: ${socket.id}`);
+
+  // Nghe sự kiện: Client gửi tin nhắn lên
+  socket.on("send_message", (data) => {
+    console.log("📩 Nhận tin nhắn:", data);
+    // Gửi tin nhắn này lại cho TẤT CẢ mọi người (Broadcast)
+    io.emit("receive_message", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User Disconnected", socket.id);
+  });
+});
 
 // 2. Kết nối Firebase
 const serviceAccount = require('./serviceAccountKey.json');
@@ -134,6 +158,6 @@ app.delete('/delete-employee/:id', async (req, res) => {
 });
 // 4. Chạy Server
 const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`Server đang chạy tại http://localhost:${PORT}`);
+server.listen(PORT, () => { // Đổi app -> server
+  console.log(`SERVER SOCKET ĐANG CHẠY TẠI http://localhost:${PORT}`);
 });
