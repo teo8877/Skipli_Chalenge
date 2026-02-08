@@ -85,7 +85,53 @@ app.post('/verify-otp', async (req, res) => {
     res.status(500).send({ success: false, error: error.message });
   }
 });
+app.get('/employees', async (req, res) => {
+  try {
+    const snapshot = await db.collection('employees').get();
+    // Biến đổi dữ liệu từ Firebase thành mảng JSON đẹp
+    const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    res.send(list);
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
 
+// 4. Thêm nhân viên mới
+app.post('/create-employee', async (req, res) => {
+  const { name, email, department } = req.body;
+  try {
+    const newEmp = { 
+      name, 
+      email, 
+      department, 
+      createdAt: new Date().toISOString() 
+    };
+    
+    // Lưu vào Firebase
+    const docRef = await db.collection('employees').add(newEmp);
+
+    // MOCK EMAIL: Thay vì gửi email thật, in ra console
+    console.log("------------------------------------------------");
+    console.log(`📧 GỬI EMAIL MỜI CHO: ${email}`);
+    console.log(`🔗 LINK SETUP ACCOUNT: http://localhost:5173/setup/${docRef.id}`);
+    console.log("------------------------------------------------");
+
+    res.send({ success: true, id: docRef.id, message: "Đã thêm NV & Gửi mail!" });
+  } catch (error) {
+    res.status(500).send({ success: false, error: error.message });
+  }
+});
+
+// 5. Xóa nhân viên
+app.delete('/delete-employee/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await db.collection('employees').doc(id).delete();
+    res.send({ success: true, message: "Đã xóa nhân viên!" });
+  } catch (error) {
+    res.status(500).send({ success: false, error: error.message });
+  }
+});
 // 4. Chạy Server
 const PORT = 5000;
 app.listen(PORT, () => {
